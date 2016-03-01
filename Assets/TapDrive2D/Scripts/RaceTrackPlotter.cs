@@ -9,7 +9,7 @@ namespace TapDrive2D.Vehicles.Car
 	{
 		// plotter
 		public Object checkpoint;
-		float lastTimeCreatedWayPoint = 0f;
+		//		float lastTimeCreatedWayPoint = 0f;
 		public List<Vector3> wayPoints;
 
 		public void Create ()
@@ -22,7 +22,7 @@ namespace TapDrive2D.Vehicles.Car
 			if (!wayPoints.Contains (pos)) {
 				Instantiate (checkpoint, pos, Quaternion.identity);
 				wayPoints.Add (pos);
-				lastTimeCreatedWayPoint = Time.time;
+//				lastTimeCreatedWayPoint = Time.time;
 			}
 			//				}
 		}
