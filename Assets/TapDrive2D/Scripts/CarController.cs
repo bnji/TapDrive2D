@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
+using UnityEngine.SceneManagement;
 
 namespace TapDrive2D.Vehicles.Car
 {
@@ -19,6 +19,17 @@ namespace TapDrive2D.Vehicles.Car
 		[Range (1f, 10f)]
 		[SerializeField]
 		public float obstacleMinDistanceBeforeDetection = 7f;
+
+		[Range (1f, 150f)]
+		[SerializeField]
+		public float maxSpeed = 100f;
+
+		[Range (0f, 150f)]
+		[SerializeField]
+		public float minSpeed = 0f;
+
+		[SerializeField]
+		public float acceleration = 100f;
 	}
 
 	[ExecuteInEditMode]
@@ -27,20 +38,22 @@ namespace TapDrive2D.Vehicles.Car
 		public CarProperties properties;
 		[Range (0.1f, 1f)]
 		public float sensitivityMult = 0.6f;
-		public float maxSpeed;
-		public float minSpeed;
-		public float acceleration;
-		public float speed;
-		public List<Vector3> tempWayPoints;
 		public int laps = 0;
 		public Wheel2D[] wheels;
+		public AudioClip audioDriving;
+		public AudioClip audioAcceleration;
+		public AudioClip audioDeceleration;
 
 		public bool CanDrive {
 			get { return _canDrive; }
 		}
 
+		AudioSource audio;
+		float speed;
 		bool _canDrive = false;
 		private Rigidbody2D rb;
+		// waypoints
+		private List<Vector3> tempWayPoints;
 		private Dictionary<int, Vector3> oldWaypoints = new Dictionary<int, Vector3> ();
 		private Vector3[] wayPoints;
 		private Vector3 nextWayPoint = Vector3.zero;
@@ -76,9 +89,9 @@ namespace TapDrive2D.Vehicles.Car
 					nextWayPointIndex = GetClosesetWayPointIndex (transform.position);
 				}
 
-//				if (speed >= maxSpeed) {
+//				if (speed >= properties.maxSpeed) {
 //					nextWayPointIndex = nextWayPointIndex + 3;
-//				} else if (speed >= maxSpeed / 2f) {
+//				} else if (speed >= properties.maxSpeed / 2f) {
 //					nextWayPointIndex = nextWayPointIndex + 2;
 //				} else {
 //					nextWayPointIndex = nextWayPointIndex + 1;
@@ -87,7 +100,7 @@ namespace TapDrive2D.Vehicles.Car
 				if (nextWayPointIndex == wayPoints.Length) {
 					laps++;
 				}
-				nextWayPointIndex = nextWayPointIndex % tempWayPoints.Count;
+				nextWayPointIndex = nextWayPointIndex % wayPoints.Length;
 				nextWayPoint = wayPoints [nextWayPointIndex];
 				Instantiate (redDot, nextWayPoint, Quaternion.identity);
 
@@ -145,7 +158,7 @@ namespace TapDrive2D.Vehicles.Car
 //					}
 					var heading = nextWayPoint - transform.position; 
 					var direction = heading / heading.magnitude;
-					var force = direction * torque * speed * Time.deltaTime;
+					var force = direction * torque * speed * Time.deltaTime * 120f;
 					wheel.Drive (force);
 				}
 			}
@@ -159,30 +172,56 @@ namespace TapDrive2D.Vehicles.Car
 				hasTouch = touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved;
 			}
 			if (Input.GetKey (KeyCode.UpArrow) || hasTouch) {
-				if (speed < maxSpeed) {
-					speed += acceleration * Time.deltaTime;
-					speed = speed > maxSpeed ? maxSpeed : speed;
+				if (!audio.isPlaying) {
+					if (speed == 0f) {
+						audio.clip = audioAcceleration;
+						audio.Play ();
+					} else {
+						audio.clip = audioDriving;
+						audio.Play ();
+					}
+				}
+				if (speed < properties.maxSpeed) {
+					speed += properties.acceleration * Time.deltaTime;
+					speed = speed > properties.maxSpeed ? properties.maxSpeed : speed;
 				}
 			} else {
-				if (speed > minSpeed) {
-					speed -= (acceleration / 2f) * Time.deltaTime;
+				if (audio.clip != audioDeceleration && speed > 0) {
+					audio.clip = audioDeceleration;
+					audio.Play ();
+				}
+				if (speed > properties.minSpeed) {
+					speed -= (properties.acceleration / 2f) * Time.deltaTime;
 					speed = speed < 0 ? 0 : speed;
 				}
 			}
+			if (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2) {
+				StartCoroutine (ReloadScene ());
+			}
 		}
+
+		IEnumerator ReloadScene ()
+		{
+			yield return new WaitForSeconds (0.5f);
+			SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+			yield return new WaitForEndOfFrame ();
+		}
+
+		bool hasRegisteredFingers = false;
 
 		void SetupWayPoints ()
 		{
 			if (!_canDrive) {
-				_canDrive = tempWayPoints.Count > 0 && Input.GetMouseButtonDown (1);
+				_canDrive = tempWayPoints.Count > 0 && (Input.GetMouseButtonDown (1) || (hasRegisteredFingers && Input.touchCount >= 1 && Input.GetTouch (0).phase == TouchPhase.Ended));
 				if (_canDrive) {
 					wayPoints = tempWayPoints.ToArray ();// Helpers.MakeSmoothCurve (tempWayPoints, 5f);
+					tempWayPoints = null;
 //					foreach (var waypoint in GameObject.FindObjectsOfType<WayPoint>()) {
 //						waypoint.GetComponent<SpriteRenderer> ().enabled = false;
 //					}
 				}
 			}
-			if (!_canDrive && Input.GetMouseButton (0)) {
+			if (!_canDrive && (Input.GetMouseButton (0) || (Input.touchCount >= 1 && (Input.GetTouch (0).phase == TouchPhase.Began || Input.GetTouch (0).phase == TouchPhase.Moved)))) {
 				if ((Time.time - lastTimeCreatedWayPoint) * 1000f >= plotInterval) {
 					var pos = Input.mousePosition;
 					pos.z = 10;
@@ -191,6 +230,7 @@ namespace TapDrive2D.Vehicles.Car
 						Instantiate (checkpoint, pos, Quaternion.identity);
 						tempWayPoints.Add (pos);
 						lastTimeCreatedWayPoint = Time.time;
+						hasRegisteredFingers = true; // temp
 					}
 				}
 			}
@@ -198,17 +238,54 @@ namespace TapDrive2D.Vehicles.Car
 
 		void Start ()
 		{
+			audio = GetComponent<AudioSource> ();
 			rb = GetComponent<Rigidbody2D> ();
 			// make sure auto mass is false
 			rb.useAutoMass = false;
 			tempWayPoints = new List<Vector3> ();
 		}
 
+		void HandleManualControl ()
+		{
+			if (Input.GetKey (KeyCode.UpArrow)) {
+				rb.freezeRotation = false;
+				foreach (var wheel in wheels) {
+					if (wheel != null) {
+						wheel.Move (WheelDirection.FORWARD);
+					}
+				}
+			}
+			if (Input.GetKey (KeyCode.DownArrow)) {
+				rb.freezeRotation = true;
+				foreach (var wheel in wheels) {
+					if (wheel != null) {
+						wheel.Move (WheelDirection.BACKWARD);
+					}
+				}
+			}
+			if (Input.GetKey (KeyCode.LeftArrow)) {
+				foreach (var wheel in wheels) {
+					if (wheel != null) {
+						wheel.TurnLeft ();
+					}
+				}
+			}
+			if (Input.GetKey (KeyCode.RightArrow)) {
+				foreach (var wheel in wheels) {
+					if (wheel != null) {
+						wheel.TurnRight ();
+					}
+				}
+			}
+		}
+
 		void FixedUpdate ()
 		{
-			HandleUserInput ();
+//			HandleManualControl ();
+//			return;
 			SetupWayPoints ();
 			if (_canDrive) {
+				HandleUserInput ();
 				SetNextWayPoint (transform.position);
 				Drive ();
 				Debug.DrawLine (transform.position, nextWayPoint, Color.red);
@@ -218,29 +295,7 @@ namespace TapDrive2D.Vehicles.Car
 		void Update ()
 		{
 			rb.mass = properties.weight;
-//			var targetDir = testWaypoint.position - testObstacle.position;
-//
-//			var first = testWaypoint.position;
-//			var second = testObstacle.position;
-//			var newVec = first - second;
-//			var newVector = Vector3.Cross (newVec, Vector3.right);
-//			newVector.Normalize ();
-//			var newPoint = newVector + second;
-//			var newPoint2 = -newVector + second;
-//			testWaypointCopy.position = new Vector2 (newPoint2.x, newPoint2.y);
-//			Debug.Log (Vector2.Dot ((testObstacle.position - testWaypoint.position), (testObstacle.position - testObstacle.up)));
-//			Debug.DrawLine (testObstacle.position, testWaypoint.position * Vector2.Dot ((testObstacle.position - testWaypoint.position), (testObstacle.position - testObstacle.up)), Color.green);
-//			Debug.DrawLine (second, newVector);
-//			var deltaX = testWaypoint.position.x - testObstacle.position.x;
-//			var deltaY = testWaypoint.position.y - testObstacle.position.y;
-//			var delta = deltaY / deltaX;
-//			Vector3 cross = Vector3.Cross (targetDir.normalized, testObstacle.up);
-//			Debug.DrawLine (testObstacle.position, perp, Color.red);
-//			Debug.Log (Vector2.Angle (targetDir, testObstacle.up) - 180f);
-//			Debug.Log (Mathf.Clamp (deltaX, -1f, 1f) + ", " + Mathf.Clamp (deltaY, -1f, 1f));
-//			Debug.Log (Mathf.Clamp (delta, 0f, 1f));
-//			Debug.Log ("dx: " + deltaX + " - dy: " + deltaY + " - delta: " + Mathf.Clamp (delta, 0f, 1f) + " - cross.z: " + cross.z);
-//			Debug.Log (targetDir + " - " + cross.z);
+			FunWithVectors ();
 		}
 
 		CarScanner scanner;
@@ -254,7 +309,7 @@ namespace TapDrive2D.Vehicles.Car
 				scanner.IsActive = false;
 //				var closesetWayPointIndex = GetClosesetWayPointIndex (hit.transform.position);
 //				Debug.Log ("closeset waypoint index: " + closesetWayPointIndex + ", next waypoint index: " + nextWayPointIndex);
-				manipulateWayPoints (nextWayPointIndex, hit.transform, properties.obstaclePathSteps);
+				manipulateWayPoints (nextWayPointIndex - 2, hit.transform, properties.obstaclePathSteps);
 //				Debug.Log ("Player hit '" + hit.collider.name + "'. Distance: " + hit.distance);
 			}
 		}
@@ -289,6 +344,32 @@ namespace TapDrive2D.Vehicles.Car
 					manipulateWayPoint (newIndex, t);
 				}
 			}
+		}
+
+		void FunWithVectors ()
+		{
+			//			var targetDir = testWaypoint.position - testObstacle.position;
+			//			var first = testWaypoint.position;
+			//			var second = testObstacle.position;
+			//			var newVec = first - second;
+			//			var newVector = Vector3.Cross (newVec, Vector3.right);
+			//			newVector.Normalize ();
+			//			var newPoint = newVector + second;
+			//			var newPoint2 = -newVector + second;
+			//			testWaypointCopy.position = new Vector2 (newPoint2.x, newPoint2.y);
+			//			Debug.Log (Vector2.Dot ((testObstacle.position - testWaypoint.position), (testObstacle.position - testObstacle.up)));
+			//			Debug.DrawLine (testObstacle.position, testWaypoint.position * Vector2.Dot ((testObstacle.position - testWaypoint.position), (testObstacle.position - testObstacle.up)), Color.green);
+			//			Debug.DrawLine (second, newVector);
+			//			var deltaX = testWaypoint.position.x - testObstacle.position.x;
+			//			var deltaY = testWaypoint.position.y - testObstacle.position.y;
+			//			var delta = deltaY / deltaX;
+			//			Vector3 cross = Vector3.Cross (targetDir.normalized, testObstacle.up);
+			//			Debug.DrawLine (testObstacle.position, perp, Color.red);
+			//			Debug.Log (Vector2.Angle (targetDir, testObstacle.up) - 180f);
+			//			Debug.Log (Mathf.Clamp (deltaX, -1f, 1f) + ", " + Mathf.Clamp (deltaY, -1f, 1f));
+			//			Debug.Log (Mathf.Clamp (delta, 0f, 1f));
+			//			Debug.Log ("dx: " + deltaX + " - dy: " + deltaY + " - delta: " + Mathf.Clamp (delta, 0f, 1f) + " - cross.z: " + cross.z);
+			//			Debug.Log (targetDir + " - " + cross.z);
 		}
 	}
 }
