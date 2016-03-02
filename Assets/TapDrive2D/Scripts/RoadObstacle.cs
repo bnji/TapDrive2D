@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace TapDrive2D.Vehicles.Car
+namespace com.huldagames.TapDrive2D
 {
 	public interface IObstacle
 	{

@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 
-namespace TapDrive2D.Vehicles.Car
+namespace com.huldagames.TapDrive2D
 {
 	public class CarScanner : MonoBehaviour
 	{
-		[Description ("Scan in ms")]
-		public float scanInterval = 1000f;
+		[Tooltip ("Scan interval in milliseconds")]
+		public float scanInterval = 10f;
 		public List<string> validTags;
 
 		public bool IsActive {
@@ -16,22 +15,20 @@ namespace TapDrive2D.Vehicles.Car
 			set;
 		}
 
-		CarController carController;
-
+		Car carController;
 		float lastHitTime = 0f;
-
 
 		// Use this for initialization
 		void Start ()
 		{
 			IsActive = true;
-			carController = GetComponentInParent<CarController> ();
+			carController = GetComponentInParent<Car> ();
 		}
 	
 		// Update is called once per frame
 		void Update ()
 		{
-			if (IsActive && carController != null && carController.CanDrive && (Time.time - lastHitTime) * 1000f >= scanInterval) {
+			if (IsActive && carController != null && carController.IsEngineOn && (Time.time - lastHitTime) * 1000f >= scanInterval) {
 				var hits = Physics2D.RaycastAll (transform.position, transform.up, 100f);
 				foreach (var hit in hits) {
 					CheckHit (hit);
@@ -62,18 +59,18 @@ namespace TapDrive2D.Vehicles.Car
 			}
 			return false;
 		}
-	}
 
-	public class CarScannerHitResult
-	{
-		public RaycastHit2D Hit {
-			get;
-			set;
-		}
+		public struct CarScannerHitResult
+		{
+			public RaycastHit2D Hit {
+				get;
+				set;
+			}
 
-		public CarScanner Scanner {
-			get;
-			set;
+			public CarScanner Scanner {
+				get;
+				set;
+			}
 		}
 	}
 }

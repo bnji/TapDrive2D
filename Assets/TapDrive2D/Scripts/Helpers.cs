@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Helpers
+namespace com.huldagames.TapDrive2D
 {
-
-
-	public class Curver : MonoBehaviour
+	public class Helpers : MonoBehaviour
 	{
 		//arrayToCurve is original Vector3 array, smoothness is the number of interpolations.
 		public static Vector3[] MakeSmoothCurve (List<Vector3> points, float smoothness)
@@ -17,7 +15,7 @@ public class Helpers
 			smoothness = smoothness >= 1f ? smoothness : 1f;
 			pointsLength = points.Count;
 			curvedLength = (pointsLength * Mathf.RoundToInt (smoothness)) - 1;
-//			Debug.Log ("curvedLength: " + curvedLength);
+			//			Debug.Log ("curvedLength: " + curvedLength);
 			curvedPoints = new List<Vector3> (curvedLength);
 			float t = 0.0f;
 			for (int pointInTimeOnCurve = 0; pointInTimeOnCurve < curvedLength + 1; pointInTimeOnCurve++) {

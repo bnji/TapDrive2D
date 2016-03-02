@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace TapDrive2D.Vehicles.Car
+namespace com.huldagames.TapDrive2D
 {
 	public enum WheelSide
 	{
@@ -13,14 +13,6 @@ namespace TapDrive2D.Vehicles.Car
 	{
 		FORWARD = 1,
 		BACKWARD = -1
-	}
-
-	[System.Serializable]
-	public class WheelProperties
-	{
-		[Range (1f, 90f)]
-		[SerializeField]
-		public float maxTurnAngle = 30f;
 	}
 
 	[RequireComponent (typeof(Rigidbody2D))]
