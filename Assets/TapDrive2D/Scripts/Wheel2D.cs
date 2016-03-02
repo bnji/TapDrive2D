@@ -92,7 +92,7 @@ namespace com.huldagames.TapDrive2D
 			if (hit.collider.tag.Equals ("RaceTrack")) {
 				switch (hit.collider.name) {
 				case "racetrack2_dirt":
-					targetDrag = 250f;
+					targetDrag = 25f;
 					speedMult = 0.7f;
 					break;
 				case "racetrack2_grass":
@@ -105,11 +105,12 @@ namespace com.huldagames.TapDrive2D
 					break;
 				}
 			}
-			if (rb.drag <= targetDrag) {
-				rb.drag += 5f * Time.deltaTime;
-			} else if (rb.drag >= targetDrag) {
-				rb.drag -= 5f * Time.deltaTime;
-			}
+			rb.drag = targetDrag;
+//			if (rb.drag <= targetDrag) {
+//				rb.drag += 5f * Time.deltaTime;
+//			} else if (rb.drag >= targetDrag) {
+//				rb.drag -= 5f * Time.deltaTime;
+//			}
 			if (targetSpeedMult <= speedMult) {
 				targetSpeedMult += 3f * Time.deltaTime;
 			} else if (targetSpeedMult >= speedMult) {
