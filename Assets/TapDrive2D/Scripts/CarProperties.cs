@@ -33,5 +33,7 @@ namespace com.huldagames.TapDrive2D
 		[Range (0.1f, 1f)]
 		public float sensitivityMult = 0.5f;
 
+		[SerializeField]
+		public bool isFourWheelDrive = false;
 	}
 }

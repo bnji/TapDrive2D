@@ -6,8 +6,10 @@ using UnityEngine.SceneManagement;
 namespace com.huldagames.TapDrive2D
 {
 	[ExecuteInEditMode]
+	[RequireComponent (typeof(Rigidbody2D))]
 	public class Car : MonoBehaviour, IObstacle
 	{
+		public bool isAI = false;
 		public Object redDot;
 		public Object blueDot;
 		public CarProperties properties;
@@ -35,7 +37,8 @@ namespace com.huldagames.TapDrive2D
 			get { return rb; }
 		}
 
-		private IInputController inputController;
+		private IInputController userController;
+		private IInputController aiController;
 		private AudioHandler audioHandler;
 		private Rigidbody2D rb;
 		private float speed;
@@ -47,19 +50,38 @@ namespace com.huldagames.TapDrive2D
 			// make sure auto mass is false
 			rb.useAutoMass = false;
 			audioHandler = GetComponentInChildren<AudioHandler> ();
-			inputController = new AIInputController (this);
-//			inputController = new UserInputController (this);
+			aiController = new AIInputController (this);
+			userController = new UserInputController (this);
 		}
 
 		void Update ()
 		{
 			rb.mass = properties.weight;
+			// todo: refactor
+			if (isAI) {
+				foreach (var wheel in wheels) {
+//					wheel.GetComponent<Rigidbody2D> ().freezeRotation = true;
+				}
+			}
+//			if (properties != null) {
+//				foreach (var wheel in wheels) {
+//					if (wheel.isRearWheel) { 
+//						wheel.SetFriction (properties.rearWheelFriction);
+//					} else {
+//						wheel.GetComponent<Rigidbody2D> ().drag = properties.frontWheelFriction;
+//					}
+//				}
+//			}
 			FunWithVectors ();
 		}
 
 		void FixedUpdate ()
 		{
-			inputController.Handle ();
+			if (isAI) {
+				aiController.ProcessInput ();
+			} else {
+				userController.ProcessInput ();
+			}
 		}
 
 		void OnNextWayPoint (Vector3 nextWayPoint)
@@ -69,10 +91,13 @@ namespace com.huldagames.TapDrive2D
 
 		void OnScannerFoundItem (CarScanner.CarScannerHitResult result)
 		{
-			var tempWaypoints = inputController.HandleScannerItem (result);
-			if (tempWaypoints != null) {
-				foreach (var tempWaypoint in tempWaypoints) {
-					Instantiate (blueDot, tempWaypoint, Quaternion.identity);
+			if (isAI) {
+				var tempWaypoints = aiController.HandleScannerItem (result);
+//				Debug.Log (tempWaypoints);
+				if (tempWaypoints != null) {
+					foreach (var tempWaypoint in tempWaypoints) {
+						Instantiate (blueDot, tempWaypoint, Quaternion.identity);
+					}
 				}
 			}
 		}

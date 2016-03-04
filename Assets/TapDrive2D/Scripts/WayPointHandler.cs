@@ -6,7 +6,12 @@ namespace com.huldagames.TapDrive2D
 {
 	public class WayPointHandler
 	{
-		private CarScanner scanner;
+		private CarScanner _scanner;
+
+		public CarScanner Scanner {
+			get { return _scanner; }
+			set { _scanner = value; }
+		}
 
 		// waypoints
 		private Dictionary<int, Vector3> oldWaypoints = new Dictionary<int, Vector3> ();
@@ -29,9 +34,9 @@ namespace com.huldagames.TapDrive2D
 			get { return _lapsCompleted; }
 		}
 
-		public WayPointHandler (CarScanner _scanner)
+		public WayPointHandler (CarScanner scanner)
 		{
-			scanner = _scanner;
+			_scanner = scanner;
 		}
 
 		int GetClosesetWayPointIndex (Vector3 position)
@@ -71,14 +76,14 @@ namespace com.huldagames.TapDrive2D
 				}
 				nextWayPointIndex = nextWayPointIndex % _wayPoints.Length;
 				_nextWayPoint = _wayPoints [nextWayPointIndex];
-
-				if (scanner != null && !scanner.IsActive) {
+				if (_scanner != null && !_scanner.IsActive) {
 					//					Debug.Log ("nextWayPointIndex: " + nextWayPointIndex + ", oldwaypoints: " + oldWaypoints.Count + ", lastModifiedWaypointIndexStart: " + lastModifiedWaypointIndexStart);
 					if (nextWayPointIndex >= oldWaypoints.Count + lastModifiedWaypointIndexStart) {
 						foreach (KeyValuePair<int, Vector3> kvp in oldWaypoints) {
 							_wayPoints [kvp.Key] = kvp.Value;
 						}
-						scanner.IsActive = true;
+						Debug.Log ("Scanner is active again");
+						_scanner.IsActive = true;
 					}
 				}
 				//				Debug.Log ("next waypoint index: " + nextWayPointIndex + " - point: " + nextWayPoint);
@@ -117,7 +122,7 @@ namespace com.huldagames.TapDrive2D
 			lastModifiedWaypointIndexStart = index;
 			for (int i = 0; i < amount; i++) {
 				var newIndex = (index + i) % _wayPoints.Length;
-				Debug.Log ("newIndex: " + newIndex + " - " + index);
+//				Debug.Log ("newIndex: " + newIndex + " - " + index);
 				if (!oldWaypoints.ContainsKey (newIndex)) {
 					oldWaypoints.Add (newIndex, _wayPoints [newIndex]);
 					tempWaypoints [i] = ManipulateWayPoint (newIndex, t);

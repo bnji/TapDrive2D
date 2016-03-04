@@ -15,21 +15,22 @@ namespace com.huldagames.TapDrive2D
 			set;
 		}
 
-		Car carController;
+		Car car;
 		float lastHitTime = 0f;
 
 		// Use this for initialization
 		void Start ()
 		{
 			IsActive = true;
-			carController = GetComponentInParent<Car> ();
+			car = GetComponentInParent<Car> ();
 		}
 	
 		// Update is called once per frame
 		void Update ()
 		{
-			if (IsActive && carController != null && carController.IsEngineOn && (Time.time - lastHitTime) * 1000f >= scanInterval) {
-				var hits = Physics2D.RaycastAll (transform.position, transform.up, 100f);
+			Debug.DrawRay (transform.position, transform.up);
+			if (IsActive && car != null && car.IsEngineOn && (Time.time - lastHitTime) * 1000f >= scanInterval) {
+				var hits = Physics2D.RaycastAll (transform.position, transform.up);
 				foreach (var hit in hits) {
 					CheckHit (hit);
 				}
@@ -52,8 +53,7 @@ namespace com.huldagames.TapDrive2D
 		{
 			if (hit.collider != null) {
 				if (validTags.Contains (hit.collider.tag)) {
-					Debug.Log (hit.collider.tag);
-					carController.SendMessage ("OnScannerFoundItem", new CarScannerHitResult () { Hit = hit, Scanner = this }, SendMessageOptions.DontRequireReceiver);
+					car.SendMessage ("OnScannerFoundItem", new CarScannerHitResult () { Hit = hit, Scanner = this }, SendMessageOptions.DontRequireReceiver);
 					return true;
 				}
 			}

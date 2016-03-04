@@ -17,7 +17,7 @@ namespace com.huldagames.TapDrive2D
 			plotter = GameObject.FindObjectOfType<RaceTrackPlotter> ();
 		}
 
-		public void Handle ()
+		public void ProcessInput ()
 		{
 			if (Input.GetKey (KeyCode.UpArrow) || (Input.touchCount > 0 && (Input.GetTouch (0).phase == TouchPhase.Stationary || Input.GetTouch (0).phase == TouchPhase.Moved))) {
 				if (car.AudioHandler != null) {
@@ -65,11 +65,11 @@ namespace com.huldagames.TapDrive2D
 			foreach (var wheel in car.wheels) {
 				if (wheel != null) {
 					// Calculate force
-					var heading = waypointHandler.NextWayPoint - car.transform.position; 
+					var heading = waypointHandler.NextWayPoint - car.transform.position;
 					var direction = heading / heading.magnitude;
-					var force = direction * car.Speed * Time.deltaTime * 120f;
+					var force = direction * car.Speed * Time.deltaTime * 60f;
 					// Apply force to wheels
-					wheel.Drive (force);
+					wheel.ApplyForce (force);
 				}
 			}
 		}
@@ -77,10 +77,14 @@ namespace com.huldagames.TapDrive2D
 		public Vector3[] HandleScannerItem (CarScanner.CarScannerHitResult result)
 		{
 			var hit = result.Hit;
-			if (hit.distance >= 1f && hit.distance <= car.Properties.obstacleMinDistanceBeforeDetection) {
+//			Debug.Log (hit.distance + " <= " + car.Properties.obstacleMinDistanceBeforeDetection);
+			if (hit.distance >= 0f && hit.distance <= car.Properties.obstacleMinDistanceBeforeDetection) {
 				scanner = result.Scanner;
 				scanner.IsActive = false;
+				waypointHandler.Scanner = scanner;
 				var tempWaypoints = waypointHandler.ManipulateWayPoints (0, hit.transform, car.Properties.obstaclePathSteps);
+//				Debug.Log (scanner.IsActive);
+//				Debug.Log (tempWaypoints);
 				return tempWaypoints;
 				//				Debug.Log ("Player hit '" + hit.collider.name + "'. Distance: " + hit.distance);
 			}

@@ -5,7 +5,7 @@ namespace com.huldagames.TapDrive2D
 {
 	public interface IInputController
 	{
-		void Handle ();
+		void ProcessInput ();
 
 		Vector3[] HandleScannerItem (CarScanner.CarScannerHitResult result);
 	}
