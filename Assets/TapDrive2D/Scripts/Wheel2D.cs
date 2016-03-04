@@ -47,10 +47,7 @@ namespace com.huldagames.TapDrive2D
 				Debug.Log (newAngle);
 				if (Mathf.Abs (newAngle) <= properties.maxTurnAngle) {
 					angle = Mathf.Abs (newAngle) < properties.maxTurnAngle ? newAngle : angle;
-					rb.MoveRotation (rb.rotation + turnPower * Time.fixedDeltaTime);// + angle);
-//				transform.Rotate (new Vector3 (transform.localRotation.eulerAngles.x, transform.localRotation.y, angle));
-//				transform.localRotation = Quaternion.Euler (transform.localRotation.eulerAngles.x, transform.localRotation.eulerAngles.y, angle);
-//				Debug.Log (angle + " - " + Mathf.Round (transform.localRotation.eulerAngles.z));
+					rb.MoveRotation (rb.rotation + turnPower * Time.fixedDeltaTime);
 				}
 			}
 		}

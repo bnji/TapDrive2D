@@ -61,7 +61,7 @@ namespace com.huldagames.TapDrive2D
 			}
 		}
 
-		public Vector3[] HandleScannerItem (CarScanner.CarScannerHitResult result)
+		public Vector3[] HandleScannerItem (CarScanner.HitResult result)
 		{
 			return null;
 		}

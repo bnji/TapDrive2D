@@ -95,7 +95,7 @@ namespace com.huldagames.TapDrive2D
 			return false;
 		}
 
-		Vector3 ManipulateWayPoint (int index, Transform t)
+		Vector3 ManipulateWayPoint (int index, float imult, Transform t)
 		{
 			var pos = t.position;
 			var rot = t.rotation.eulerAngles.z;
@@ -106,8 +106,8 @@ namespace com.huldagames.TapDrive2D
 			var xt = 1 - Mathf.Abs (rotMult);
 			var yt = 1 - xt;
 			var rotMultSign = Mathf.Sign (rotMult);
-			xt = xt * mult * rotMultSign;
-			yt = yt * mult * rotMultSign;
+			xt = xt * mult * rotMultSign * imult;
+			yt = yt * mult * rotMultSign * imult;
 			//			Debug.Log ("xt: " + xt + ", yt: " + yt + ", rotmult: " + rotMult + ", rot: " + rot);
 			_wayPoints [index] = new Vector3 (tempWP.x + xt, tempWP.y + yt, _nextWayPoint.z);
 			//			Debug.Log ("WayPoint changed from: " + tempWP + " to " + wayPoints [index]);
@@ -117,15 +117,24 @@ namespace com.huldagames.TapDrive2D
 		public Vector3[] ManipulateWayPoints (int index, Transform t, int amount)
 		{
 			index = nextWayPointIndex + index;
+			index = index < 0 ? 0 : index;
 			Vector3[] tempWaypoints = new Vector3[amount];
 			oldWaypoints.Clear ();
 			lastModifiedWaypointIndexStart = index;
+			var middle = amount / 2;
+			var imult = 0f;
 			for (int i = 0; i < amount; i++) {
 				var newIndex = (index + i) % _wayPoints.Length;
-//				Debug.Log ("newIndex: " + newIndex + " - " + index);
+				if (i >= middle) {
+					imult++;
+				} else {
+					imult--;
+				}
+				imult = Mathf.Clamp (Mathf.Abs (imult), 1f, (float)middle);
 				if (!oldWaypoints.ContainsKey (newIndex)) {
-					oldWaypoints.Add (newIndex, _wayPoints [newIndex]);
-					tempWaypoints [i] = ManipulateWayPoint (newIndex, t);
+					var wayPoint = _wayPoints [newIndex];
+					oldWaypoints.Add (newIndex, wayPoint);
+					tempWaypoints [i] = ManipulateWayPoint (newIndex, imult / (float)(amount / 3f), t);
 				}
 			}
 			return tempWaypoints;

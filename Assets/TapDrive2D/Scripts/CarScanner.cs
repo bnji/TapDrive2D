@@ -30,20 +30,23 @@ namespace com.huldagames.TapDrive2D
 		{
 			Debug.DrawRay (transform.position, transform.up);
 			if (IsActive && car != null && car.IsEngineOn && (Time.time - lastHitTime) * 1000f >= scanInterval) {
+				var hasHit = false;
 				var hits = Physics2D.RaycastAll (transform.position, transform.up);
 				foreach (var hit in hits) {
-					CheckHit (hit);
+					hasHit = CheckHit (hit);
 				}
-//				var hit = Physics2D.Raycast (transform.position, transform.up);
-//				var hit2 = Physics2D.Raycast (transform.position + new Vector3 (0.5f, 0f), transform.up);
-//				var hit3 = Physics2D.Raycast (transform.position + new Vector3 (-0.5f, 0f), transform.up);
-//				if (!CheckHit (hit)) {
-//					if (!CheckHit (hit2)) {
-//						if (!CheckHit (hit3)) {
-//							//...
-//						}
-//					}
-//				}
+				if (!hasHit) {
+					var hits2 = Physics2D.RaycastAll (transform.position + new Vector3 (0.5f, 0f), transform.up);
+					foreach (var hit in hits2) {
+						hasHit = CheckHit (hit);
+					}
+				}
+				if (!hasHit) {
+					var hits3 = Physics2D.RaycastAll (transform.position + new Vector3 (-0.5f, 0f), transform.up);
+					foreach (var hit in hits3) {
+						hasHit = CheckHit (hit);
+					}
+				}
 				lastHitTime = Time.time;
 			}
 		}
@@ -53,14 +56,14 @@ namespace com.huldagames.TapDrive2D
 		{
 			if (hit.collider != null) {
 				if (validTags.Contains (hit.collider.tag)) {
-					car.SendMessage ("OnScannerFoundItem", new CarScannerHitResult () { Hit = hit, Scanner = this }, SendMessageOptions.DontRequireReceiver);
+					car.SendMessage ("OnScannerFoundItem", new HitResult () { Hit = hit, Scanner = this }, SendMessageOptions.DontRequireReceiver);
 					return true;
 				}
 			}
 			return false;
 		}
 
-		public struct CarScannerHitResult
+		public struct HitResult
 		{
 			public RaycastHit2D Hit {
 				get;

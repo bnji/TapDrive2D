@@ -7,6 +7,6 @@ namespace com.huldagames.TapDrive2D
 	{
 		void ProcessInput ();
 
-		Vector3[] HandleScannerItem (CarScanner.CarScannerHitResult result);
+		Vector3[] HandleScannerItem (CarScanner.HitResult result);
 	}
 }

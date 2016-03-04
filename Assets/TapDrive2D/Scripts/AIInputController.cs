@@ -74,19 +74,15 @@ namespace com.huldagames.TapDrive2D
 			}
 		}
 
-		public Vector3[] HandleScannerItem (CarScanner.CarScannerHitResult result)
+		public Vector3[] HandleScannerItem (CarScanner.HitResult result)
 		{
 			var hit = result.Hit;
-//			Debug.Log (hit.distance + " <= " + car.Properties.obstacleMinDistanceBeforeDetection);
-			if (hit.distance >= 0f && hit.distance <= car.Properties.obstacleMinDistanceBeforeDetection) {
+			if (hit.distance >= 1f && hit.distance <= car.Properties.obstacleMinDistanceBeforeDetection) {
 				scanner = result.Scanner;
 				scanner.IsActive = false;
 				waypointHandler.Scanner = scanner;
 				var tempWaypoints = waypointHandler.ManipulateWayPoints (0, hit.transform, car.Properties.obstaclePathSteps);
-//				Debug.Log (scanner.IsActive);
-//				Debug.Log (tempWaypoints);
 				return tempWaypoints;
-				//				Debug.Log ("Player hit '" + hit.collider.name + "'. Distance: " + hit.distance);
 			}
 			return null;
 		}

@@ -89,7 +89,7 @@ namespace com.huldagames.TapDrive2D
 			Instantiate (redDot, nextWayPoint, Quaternion.identity);
 		}
 
-		void OnScannerFoundItem (CarScanner.CarScannerHitResult result)
+		void OnScannerFoundItem (CarScanner.HitResult result)
 		{
 			if (isAI) {
 				var tempWaypoints = aiController.HandleScannerItem (result);
