@@ -28,6 +28,7 @@ namespace com.huldagames.TapDrive2D
 			if (tempWayPoints != null) {
 				if (tempWayPoints.Count > 0 && (Input.GetMouseButtonDown (1) || (Input.touchCount >= 1 && Input.touchCount >= 1 && Input.GetTouch (0).phase == TouchPhase.Ended))) {
 					result = tempWayPoints.ToArray ();// Helpers.MakeSmoothCurve (tempWayPoints, 5f);
+					GameManager.SaveWayPoints (result);
 //					GameObject.FindObjectOfType<Camera> ().GetComponent<UnityStandardAssets._2D.Camera2DFollow> ().enabled = true;
 					tempWayPoints = null;
 					//					foreach (var waypoint in GameObject.FindObjectsOfType<WayPoint>()) {

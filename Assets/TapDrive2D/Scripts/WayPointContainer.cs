@@ -10,7 +10,17 @@ namespace com.huldagames.TapDrive2D
 	public class WayPointContainer
 	{
 		[XmlArray ("WayPoints"),XmlArrayItem ("WayPoints")]
-		public WayPoint[] WayPoints;
+		public Vector3[] WayPoints;
+
+		public WayPointContainer ()
+		{
+			
+		}
+
+		public WayPointContainer (Vector3[] wayPoints)
+		{
+			this.WayPoints = wayPoints;
+		}
 
 		public void Save (string path)
 		{

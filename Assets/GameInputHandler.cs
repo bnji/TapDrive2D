@@ -18,6 +18,14 @@ namespace com.huldagames.TapDrive2D
 			if (Input.GetKey (KeyCode.R) || (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2)) {
 				GameManager.Instance.ReloadScene (0.5f);
 			}
+
+			if (Input.GetKey (KeyCode.L)) {// || (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2)) {
+				var wayPoints = GameManager.LoadWayPoints ();
+				var car = GameObject.FindObjectOfType<Car> ();
+				if (car != null) {
+					car.InputController.LoadWayPoints (wayPoints);
+				}
+			}
 		}
 	}
 }

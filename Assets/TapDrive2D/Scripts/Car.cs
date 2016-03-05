@@ -9,64 +9,63 @@ namespace com.huldagames.TapDrive2D
 	[RequireComponent (typeof(Rigidbody2D))]
 	public class Car : MonoBehaviour, IObstacle
 	{
-		public bool isAI = false;
 		public Object redDot;
 		public Object blueDot;
-		public CarProperties properties;
+		public CarProperties _properties;
 		public Wheel2D[] wheels;
 
 		public bool IsEngineOn {
-			get { return isEngineOn; }
-			set { isEngineOn = value; }
+			get { return _isEngineOn; }
+			set { _isEngineOn = value; }
 		}
 
 		public float Speed {
-			get { return speed; }
-			set { speed = value; }
+			get { return _speed; }
+			set { _speed = value; }
 		}
 
 		public CarProperties Properties {
-			get { return properties; }
+			get { return _properties; }
 		}
 
 		public AudioHandler AudioHandler {
-			get { return audioHandler; }
+			get { return _audioHandler; }
 		}
 
 		public Rigidbody2D RigidBody2D {
-			get { return rb; }
+			get { return _rigidBody2D; }
 		}
 
-		private IInputController userController;
-		private IInputController aiController;
-		private AudioHandler audioHandler;
-		private Rigidbody2D rb;
-		private float speed;
-		private bool isEngineOn = false;
+		public IInputController InputController {
+			get { return _inputController; }
+		}
+
+		private IInputController _inputController;
+		private AudioHandler _audioHandler;
+		private Rigidbody2D _rigidBody2D;
+		private float _speed;
+		private bool _isEngineOn = false;
 
 		void Start ()
 		{
-			rb = GetComponent<Rigidbody2D> ();
+			_rigidBody2D = GetComponent<Rigidbody2D> ();
 			// make sure auto mass is false
-			rb.useAutoMass = false;
-			audioHandler = GetComponentInChildren<AudioHandler> ();
-			aiController = new AIInputController (this);
-			userController = new UserInputController (this);
+			_rigidBody2D.useAutoMass = false;
+			_audioHandler = GetComponentInChildren<AudioHandler> ();
+//			_inputController = new AIInputController (this);
+//			_inputController = new UserInputController (this);
+			_inputController = new FollowMouseInputController (this);
 		}
 
 		void Update ()
 		{
-			rb.mass = properties.weight;
+			_rigidBody2D.mass = _properties.weight;
 //			FunWithVectors ();
 		}
 
 		void FixedUpdate ()
 		{
-			if (isAI) {
-				aiController.ProcessInput ();
-			} else {
-				userController.ProcessInput ();
-			}
+			_inputController.ProcessInput ();
 		}
 
 		void OnNextWayPoint (Vector3 nextWayPoint)
@@ -76,24 +75,22 @@ namespace com.huldagames.TapDrive2D
 
 		void OnScannerFoundItem (CarScanner.HitResult result)
 		{
-			if (isAI) {
-				var tempWaypoints = aiController.HandleScannerItem (result);
+			var tempWaypoints = _inputController.HandleScannerItem (result);
 //				Debug.Log (tempWaypoints);
-				if (tempWaypoints != null) {
-					foreach (var tempWaypoint in tempWaypoints) {
-						Instantiate (blueDot, tempWaypoint, Quaternion.identity);
-					}
+			if (tempWaypoints != null) {
+				foreach (var tempWaypoint in tempWaypoints) {
+					Instantiate (blueDot, tempWaypoint, Quaternion.identity);
 				}
 			}
 		}
 
 		void OnMovingForward ()
 		{
-			if (speed < properties.maxSpeed) {
-				speed += properties.acceleration * Time.deltaTime;
-				speed = speed > properties.maxSpeed ? properties.maxSpeed : speed;
+			if (_speed < _properties.maxSpeed) {
+				_speed += _properties.acceleration * Time.deltaTime;
+				_speed = _speed > _properties.maxSpeed ? _properties.maxSpeed : _speed;
 			}
-			if (audioHandler != null) {
+			if (_audioHandler != null) {
 //				audioHandler.HandleAcceleration (speed);
 			}
 
@@ -101,11 +98,11 @@ namespace com.huldagames.TapDrive2D
 
 		void OnMovingBackwards ()
 		{
-			if (speed > properties.minSpeed) {
-				speed -= (properties.acceleration / 2f) * Time.deltaTime;
-				speed = speed < 0 ? 0 : speed;
+			if (_speed > _properties.minSpeed) {
+				_speed -= (_properties.acceleration / 2f) * Time.deltaTime;
+				_speed = _speed < 0 ? 0 : _speed;
 			}
-			if (audioHandler != null) {
+			if (_audioHandler != null) {
 //				audioHandler.HandleDeceleration (speed);
 			}
 		}

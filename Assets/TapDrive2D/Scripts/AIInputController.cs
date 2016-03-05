@@ -36,11 +36,16 @@ namespace com.huldagames.TapDrive2D
 
 		void SetupWaypoints ()
 		{
-			if (plotter != null) {
-				waypointHandler.WayPoints = plotter.SetupWayPoints ();
-				if (waypointHandler.WayPoints != null) {
-					car.IsEngineOn = true;
-				}
+			if (plotter != null && !car.IsEngineOn) {
+				LoadWayPoints (plotter.SetupWayPoints ());
+			}
+		}
+
+		public void LoadWayPoints (Vector3[] wayPoints)
+		{
+			waypointHandler.WayPoints = wayPoints;
+			if (waypointHandler.WayPoints != null) {
+				car.IsEngineOn = true;
 			}
 		}
 

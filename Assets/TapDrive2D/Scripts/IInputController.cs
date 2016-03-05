@@ -7,6 +7,8 @@ namespace com.huldagames.TapDrive2D
 	{
 		void ProcessInput ();
 
+		void LoadWayPoints (Vector3[] wayPoints);
+
 		Vector3[] HandleScannerItem (CarScanner.HitResult result);
 	}
 }

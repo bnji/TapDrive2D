@@ -5,7 +5,7 @@ namespace com.huldagames.TapDrive2D
 {
 	public class UserInputController : IInputController
 	{
-		Car car;
+		private Car car;
 
 		public UserInputController (Car _car)
 		{
@@ -47,10 +47,6 @@ namespace com.huldagames.TapDrive2D
 		{
 			foreach (var wheel in car.wheels) {
 				if (wheel != null) {
-//					if (car.Speed < car.Properties.maxSpeed) {
-//						car.Speed += car.Properties.acceleration * Time.deltaTime;
-//						car.Speed = car.Speed > car.Properties.maxSpeed ? car.Properties.maxSpeed : car.Speed;
-//					}
 					var force = dir * wheel.transform.up * car.Speed * Time.deltaTime * 32f;
 					if (car.Properties.isFourWheelDrive) {
 						wheel.ApplyForce (force);
@@ -61,6 +57,11 @@ namespace com.huldagames.TapDrive2D
 					}
 				}
 			}
+		}
+
+		public void LoadWayPoints (Vector3[] wayPoints)
+		{
+			
 		}
 
 		public Vector3[] HandleScannerItem (CarScanner.HitResult result)
