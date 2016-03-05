@@ -57,22 +57,7 @@ namespace com.huldagames.TapDrive2D
 		void Update ()
 		{
 			rb.mass = properties.weight;
-			// todo: refactor
-			if (isAI) {
-				foreach (var wheel in wheels) {
-//					wheel.GetComponent<Rigidbody2D> ().freezeRotation = true;
-				}
-			}
-//			if (properties != null) {
-//				foreach (var wheel in wheels) {
-//					if (wheel.isRearWheel) { 
-//						wheel.SetFriction (properties.rearWheelFriction);
-//					} else {
-//						wheel.GetComponent<Rigidbody2D> ().drag = properties.frontWheelFriction;
-//					}
-//				}
-//			}
-			FunWithVectors ();
+//			FunWithVectors ();
 		}
 
 		void FixedUpdate ()
@@ -99,6 +84,29 @@ namespace com.huldagames.TapDrive2D
 						Instantiate (blueDot, tempWaypoint, Quaternion.identity);
 					}
 				}
+			}
+		}
+
+		void OnMovingForward ()
+		{
+			if (speed < properties.maxSpeed) {
+				speed += properties.acceleration * Time.deltaTime;
+				speed = speed > properties.maxSpeed ? properties.maxSpeed : speed;
+			}
+			if (audioHandler != null) {
+//				audioHandler.HandleAcceleration (speed);
+			}
+
+		}
+
+		void OnMovingBackwards ()
+		{
+			if (speed > properties.minSpeed) {
+				speed -= (properties.acceleration / 2f) * Time.deltaTime;
+				speed = speed < 0 ? 0 : speed;
+			}
+			if (audioHandler != null) {
+//				audioHandler.HandleDeceleration (speed);
 			}
 		}
 

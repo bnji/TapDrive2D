@@ -6,6 +6,11 @@ namespace com.huldagames.TapDrive2D
 {
 	public class Helpers : MonoBehaviour
 	{
+		public static Vector3[] MakeSmoothCurve (Vector3[] points, float smoothness)
+		{
+			return MakeSmoothCurve (new List<Vector3> (points), smoothness);
+		}
+
 		//arrayToCurve is original Vector3 array, smoothness is the number of interpolations.
 		public static Vector3[] MakeSmoothCurve (List<Vector3> points, float smoothness)
 		{

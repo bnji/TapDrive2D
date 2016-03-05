@@ -28,6 +28,7 @@ namespace com.huldagames.TapDrive2D
 			if (tempWayPoints != null) {
 				if (tempWayPoints.Count > 0 && (Input.GetMouseButtonDown (1) || (Input.touchCount >= 1 && Input.touchCount >= 1 && Input.GetTouch (0).phase == TouchPhase.Ended))) {
 					result = tempWayPoints.ToArray ();// Helpers.MakeSmoothCurve (tempWayPoints, 5f);
+//					GameObject.FindObjectOfType<Camera> ().GetComponent<UnityStandardAssets._2D.Camera2DFollow> ().enabled = true;
 					tempWayPoints = null;
 					//					foreach (var waypoint in GameObject.FindObjectsOfType<WayPoint>()) {
 					//						waypoint.GetComponent<SpriteRenderer> ().enabled = false;
@@ -48,25 +49,5 @@ namespace com.huldagames.TapDrive2D
 			}
 			return result;
 		}
-
-		//		// plotter
-		//		public Object checkpoint;
-		//		//		float lastTimeCreatedWayPoint = 0f;
-		//		public List<Vector3> wayPoints;
-		//
-		//		public void Create ()
-		//		{
-		//			Debug.Log (Input.mousePosition);
-		//			//				if (Time.time - lastTimeCreatedWayPoint >= 0.2f) {
-		//			var pos = Input.mousePosition;
-		//			pos.z = 10;
-		//			pos = Camera.main.ScreenToWorldPoint (pos);
-		//			if (!wayPoints.Contains (pos)) {
-		//				Instantiate (checkpoint, pos, Quaternion.identity);
-		//				wayPoints.Add (pos);
-		////				lastTimeCreatedWayPoint = Time.time;
-		//			}
-		//			//				}
-		//		}
 	}
 }

@@ -19,28 +19,12 @@ namespace com.huldagames.TapDrive2D
 
 		public void ProcessInput ()
 		{
-			if (Input.GetKey (KeyCode.UpArrow) || (Input.touchCount > 0 && (Input.GetTouch (0).phase == TouchPhase.Stationary || Input.GetTouch (0).phase == TouchPhase.Moved))) {
-				if (car.AudioHandler != null) {
-					car.AudioHandler.HandleAcceleration (car.Speed);
-				}
-				if (car.Speed < car.Properties.maxSpeed) {
-					car.Speed += car.Properties.acceleration * Time.deltaTime;
-					car.Speed = car.Speed > car.Properties.maxSpeed ? car.Properties.maxSpeed : car.Speed;
-				}
-			} else {
-				if (car.AudioHandler != null) {
-					car.AudioHandler.HandleDeceleration (car.Speed);
-				}
-				if (car.Speed > car.Properties.minSpeed) {
-					car.Speed -= (car.properties.acceleration / 2f) * Time.deltaTime;
-					car.Speed = car.Speed < 0 ? 0 : car.Speed;
-				}
-			}
-			if (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2) {
-				GameManager.Instance.ReloadScene (0.5f);
-			}
-
 			if (car.IsEngineOn) {
+				if (Input.GetKey (KeyCode.UpArrow) || (Input.touchCount > 0 && (Input.GetTouch (0).phase == TouchPhase.Stationary || Input.GetTouch (0).phase == TouchPhase.Moved))) {
+					car.SendMessage ("OnMovingForward", SendMessageOptions.DontRequireReceiver);
+				} else {
+					car.SendMessage ("OnMovingBackwards", SendMessageOptions.DontRequireReceiver);
+				}
 				if (waypointHandler.SetNextWayPoint (car.transform.position, car.Properties.sensitivityMult, true)) {
 					car.SendMessage ("OnNextWayPoint", waypointHandler.NextWayPoint, SendMessageOptions.DontRequireReceiver);
 				}
@@ -81,8 +65,9 @@ namespace com.huldagames.TapDrive2D
 				scanner = result.Scanner;
 				scanner.IsActive = false;
 				waypointHandler.Scanner = scanner;
-				var tempWaypoints = waypointHandler.ManipulateWayPoints (0, hit.transform, car.Properties.obstaclePathSteps);
-				return tempWaypoints;
+				var tempWayPoints = waypointHandler.ManipulateWayPoints (0, hit.transform, car.Properties.obstaclePathSteps);
+//				tempWayPoints = Helpers.MakeSmoothCurve (tempWayPoints, 5f);
+				return tempWayPoints;
 			}
 			return null;
 		}

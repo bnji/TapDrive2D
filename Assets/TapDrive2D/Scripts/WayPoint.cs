@@ -1,21 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace com.huldagames.TapDrive2D
 {
 	public class WayPoint : MonoBehaviour
 	{
-
-		// Use this for initialization
-		void Start ()
-		{
-	
-		}
-	
-		// Update is called once per frame
-		void Update ()
-		{
-	
-		}
+		//		[XmlAttribute ("point")]
+		//		public Vector3 point = Vector3.zero;
+		//
+		//		public WayPoint (Vector3 _point)
+		//		{
+		//			this.point = point;
+		//		}
 	}
 }

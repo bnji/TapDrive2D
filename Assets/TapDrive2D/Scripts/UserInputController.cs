@@ -17,9 +17,11 @@ namespace com.huldagames.TapDrive2D
 			if (Input.GetKey (KeyCode.UpArrow)) {
 				car.RigidBody2D.freezeRotation = false;
 				Drive (1f);
+				car.SendMessage ("OnMovingForward", SendMessageOptions.DontRequireReceiver);
 			} else if (Input.GetKey (KeyCode.DownArrow)) {
 				car.RigidBody2D.freezeRotation = true;
 				Drive (-0.5f);
+				car.SendMessage ("OnMovingBackwards", SendMessageOptions.DontRequireReceiver);
 			} else {
 				foreach (var wheel in car.wheels) {
 					wheel.ResetWheelPosition (3f);	
@@ -45,10 +47,10 @@ namespace com.huldagames.TapDrive2D
 		{
 			foreach (var wheel in car.wheels) {
 				if (wheel != null) {
-					if (car.Speed < car.Properties.maxSpeed) {
-						car.Speed += car.Properties.acceleration * Time.deltaTime;
-						car.Speed = car.Speed > car.Properties.maxSpeed ? car.Properties.maxSpeed : car.Speed;
-					}
+//					if (car.Speed < car.Properties.maxSpeed) {
+//						car.Speed += car.Properties.acceleration * Time.deltaTime;
+//						car.Speed = car.Speed > car.Properties.maxSpeed ? car.Properties.maxSpeed : car.Speed;
+//					}
 					var force = dir * wheel.transform.up * car.Speed * Time.deltaTime * 32f;
 					if (car.Properties.isFourWheelDrive) {
 						wheel.ApplyForce (force);
