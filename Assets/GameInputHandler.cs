@@ -15,15 +15,18 @@ namespace com.huldagames.TapDrive2D
 		// Update is called once per frame
 		void Update ()
 		{
-			if (Input.GetKey (KeyCode.R) || (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2)) {
+			if (Input.GetKeyDown (KeyCode.R) || (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2)) {
 				GameManager.Instance.ReloadScene (0.5f);
 			}
 
-			if (Input.GetKey (KeyCode.L)) {// || (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2)) {
+			if (Input.GetKeyDown (KeyCode.L)) {// || (Input.touchCount >= 1 && Input.GetTouch (0).tapCount >= 2)) {
 				var wayPoints = GameManager.LoadWayPoints ();
 				var car = GameObject.FindObjectOfType<Car> ();
-				if (car != null) {
+				if (car != null && wayPoints != null) {
 					car.InputController.LoadWayPoints (wayPoints);
+					Debug.Log (wayPoints.Length + " waypoints have been loaded!");
+				} else {
+					Debug.Log ("Could not load waypoints from file!");
 				}
 			}
 		}

@@ -51,13 +51,13 @@ namespace com.huldagames.TapDrive2D
 
 		void Drive ()
 		{
+			// Calculate force
+			var power = Vector2.Dot (car.transform.up.normalized, (waypointHandler.NextWayPoint - car.transform.position).normalized);
+			var heading = waypointHandler.NextWayPoint - car.transform.position;
+			var direction = heading / heading.magnitude;
+			var force = direction * car.Speed * Time.deltaTime * 60f * Mathf.Clamp (power, 0.5f, 1f);
 			foreach (var wheel in car.wheels) {
 				if (wheel != null) {
-					// Calculate force
-					var heading = waypointHandler.NextWayPoint - car.transform.position;
-					var direction = heading / heading.magnitude;
-					var force = direction * car.Speed * Time.deltaTime * 60f;
-					// Apply force to wheels
 					wheel.ApplyForce (force);
 				}
 			}

@@ -62,7 +62,6 @@ namespace com.huldagames.TapDrive2D
 				if (_nextWayPoint == Vector3.zero) {
 					nextWayPointIndex = GetClosesetWayPointIndex (currentPosition);
 				}
-
 				//				if (speed >= properties.maxSpeed) {
 				//					nextWayPointIndex = nextWayPointIndex + 3;
 				//				} else if (speed >= properties.maxSpeed / 2f) {
@@ -82,7 +81,7 @@ namespace com.huldagames.TapDrive2D
 						foreach (KeyValuePair<int, Vector3> kvp in oldWaypoints) {
 							_wayPoints [kvp.Key] = kvp.Value;
 						}
-						Debug.Log ("Scanner is active again");
+//						Debug.Log ("Scanner is active again");
 						_scanner.IsActive = true;
 					}
 				}

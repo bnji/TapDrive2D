@@ -52,9 +52,14 @@ namespace com.huldagames.TapDrive2D
 			// make sure auto mass is false
 			_rigidBody2D.useAutoMass = false;
 			_audioHandler = GetComponentInChildren<AudioHandler> ();
-//			_inputController = new AIInputController (this);
+			_inputController = new AIInputController (this);
 //			_inputController = new UserInputController (this);
-			_inputController = new FollowMouseInputController (this);
+//			_inputController = new FollowMouseInputController (this);
+		}
+
+		void OnValidate ()
+		{
+//			Debug.Log ("??");
 		}
 
 		void Update ()
