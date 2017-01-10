@@ -11,17 +11,33 @@ public class CubePlayer : MonoBehaviour
     public bool IsInitialized { get; private set; }
 
     bool isMoving = false;
-
-    // Use this for initialization
+    Transform cubeCenter = null;
+    
     void Start()
     {
         IsInitialized = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    float minDist = 100f;
+    void FixedUpdate()
     {
-
+        if(cubeCenter != null)
+        {
+            var dist = Mathf.Abs(Vector2.Distance(cubeCenter.position, this.transform.position));
+            //Debug.Log(dist);
+            if(dist < minDist)
+            {
+                minDist = dist;
+                Debug.Log(minDist);
+            }
+            if(dist <= 0.01f)
+            {
+                this.rigidBody.velocity = Vector2.zero;
+                this.transform.parent = cubeCenter;
+                isMoving = false;
+                cubeCenter = null;
+            }
+        }
     }
 
     internal void Initialize(Transform t)
@@ -67,12 +83,13 @@ public class CubePlayer : MonoBehaviour
             SceneManager.LoadScene(1);
             //StopMoving();
         }
-        Debug.Log(collider.name);
+        //Debug.Log(collider.name);
     }
 
     void OnHitCubeCenter(Transform t)
     {
-        StartCoroutine(StopMoving(t));
+        this.cubeCenter = t;
+        //StartCoroutine(StopMoving(t));
     }
     IEnumerator StopMoving(Transform t)
     {
