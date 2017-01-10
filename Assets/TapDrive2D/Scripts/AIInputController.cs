@@ -55,7 +55,7 @@ namespace com.huldagames.TapDrive2D
 			var power = Vector2.Dot (car.transform.up.normalized, (waypointHandler.NextWayPoint - car.transform.position).normalized);
 			var heading = waypointHandler.NextWayPoint - car.transform.position;
 			var direction = heading / heading.magnitude;
-			var force = direction * car.Speed * Time.deltaTime * 60f * Mathf.Clamp (power, 0.5f, 1f);
+			var force = direction * car.Speed * Time.deltaTime * 60f * Mathf.Clamp (power, 0.3f, 1f);
 			foreach (var wheel in car.wheels) {
 				if (wheel != null) {
 					wheel.ApplyForce (force);

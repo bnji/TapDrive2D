@@ -14,11 +14,13 @@ namespace com.huldagames.TapDrive2D
 		public bool isActive = true;
 
 		Rigidbody2D rb;
-		float angle = 0f;
+		//		float angle = 0f;
 		float speedMult = 1f;
 		float targetDrag = 0f;
 		float targetSpeedMult = 1f;
 		bool canTurn = true;
+
+		float lastTurnDir = 0f;
 
 		public Rigidbody2D RigidBody2D {
 			get { return rb; }
@@ -41,14 +43,16 @@ namespace com.huldagames.TapDrive2D
 
 		private void Turn (float turnPower)
 		{
-			if (canTurn && rb.velocity.magnitude > 0f) {
-				var newAngle = angle + turnPower * Time.deltaTime;
-				newAngle = Mathf.Abs (newAngle) >= properties.maxTurnAngle ? properties.maxTurnAngle : Mathf.Abs (newAngle);
-				Debug.Log (newAngle);
-				if (Mathf.Abs (newAngle) <= properties.maxTurnAngle) {
-					angle = Mathf.Abs (newAngle) < properties.maxTurnAngle ? newAngle : angle;
-					rb.MoveRotation (rb.rotation + turnPower * Time.fixedDeltaTime);
-				}
+			var currentAngle = Vector2.Dot (transform.up.normalized, (transform.up - GetComponentInParent<Car> ().transform.up).normalized) * 180f;
+//			Debug.Log (currentAngle);
+			if (currentAngle <= properties.maxTurnAngle || (currentAngle >= properties.maxTurnAngle && lastTurnDir != turnPower)) {
+//				var newAngle = angle + turnPower * Time.deltaTime;
+//				newAngle = Mathf.Abs (newAngle) >= properties.maxTurnAngle ? properties.maxTurnAngle : Mathf.Abs (newAngle);
+//				Debug.Log (Vector2.Dot (transform.up.normalized, (transform.up - GetComponentInParent<Car> ().transform.up).normalized) * 180f);
+//				if (Mathf.Abs (newAngle) <= properties.maxTurnAngle) {
+//					angle = Mathf.Abs (newAngle) < properties.maxTurnAngle ? newAngle : angle;
+				rb.MoveRotation (rb.rotation + turnPower * Time.fixedDeltaTime);
+//				}
 			}
 		}
 
@@ -56,6 +60,7 @@ namespace com.huldagames.TapDrive2D
 		{
 			if (isActive) {
 				canTurn = Vector2.Dot (transform.up.normalized, force.normalized) > 0f;
+//				Debug.Log (Vector2.Dot (transform.up.normalized, force.normalized));
 				rb.AddForce (force * speedMult);
 			}
 		}

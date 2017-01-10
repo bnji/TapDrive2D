@@ -30,14 +30,14 @@ namespace com.huldagames.TapDrive2D
 			if (Input.GetKey (KeyCode.LeftArrow)) {
 				foreach (var wheel in car.wheels) {
 					if (wheel != null) {
-						wheel.TurnLeft (80f);
+						wheel.TurnLeft (car.Properties.turnSpeed * 500f);
 					}
 				}
 			}
 			if (Input.GetKey (KeyCode.RightArrow)) {
 				foreach (var wheel in car.wheels) {
 					if (wheel != null) {
-						wheel.TurnRight (80f);
+						wheel.TurnRight (car.Properties.turnSpeed * 500f);
 					}
 				}
 			}
