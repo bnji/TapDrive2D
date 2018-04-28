@@ -28,7 +28,7 @@ public class Rotate : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (DateTime.UtcNow.Subtract(this.lastRotation).Seconds > this.rotationInterval)
+        if (DateTime.UtcNow.Subtract(this.lastRotation).Seconds > this.rotationInterval + 1f)
         {
             this.tempTimeCounter = this.rotationInterval;
             if (Mathf.Abs(transform.eulerAngles.z - this.tempRotation % 360f) < this.rotationDegrees)
@@ -57,4 +57,8 @@ public class Rotate : MonoBehaviour
     }
 }
 
-public enum RotationDirection { CLOCKWISE, COUNTER_CLOCKWISE }
+public enum RotationDirection
+{
+    CLOCKWISE,
+    COUNTER_CLOCKWISE
+}

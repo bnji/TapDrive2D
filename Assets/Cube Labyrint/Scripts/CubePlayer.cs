@@ -8,34 +8,41 @@ public class CubePlayer : MonoBehaviour
 
     public float movementForce = 1f;
     public Rigidbody2D rigidBody;
+
     public bool IsInitialized { get; private set; }
 
     bool isMoving = false;
     Transform cubeCenter = null;
-    
+    float minDistRegistered = int.MaxValue;
+    int lastCubeHashCode = -1;
+    int cubeHitCount = 0;
+
     void Start()
     {
         IsInitialized = false;
     }
 
-    float minDist = 100f;
     void FixedUpdate()
     {
-        if(cubeCenter != null)
+        if (cubeCenter != null)
         {
-            var dist = Mathf.Abs(Vector2.Distance(cubeCenter.position, this.transform.position));
-            //Debug.Log(dist);
-            if(dist < minDist)
+            if (cubeHitCount > 1 && lastCubeHashCode != cubeCenter.GetHashCode())
             {
-                minDist = dist;
-                Debug.Log(minDist);
-            }
-            if(dist <= 0.01f)
-            {
-                this.rigidBody.velocity = Vector2.zero;
-                this.transform.parent = cubeCenter;
-                isMoving = false;
-                cubeCenter = null;
+                var currentDistance = Mathf.Abs(Vector2.Distance(new Vector2(cubeCenter.position.x, cubeCenter.position.y), new Vector2(this.transform.position.x, this.transform.position.y)));
+                if (currentDistance < minDistRegistered)
+                {
+                    minDistRegistered = currentDistance;
+                }
+                else
+                {
+                    this.minDistRegistered = int.MaxValue;
+                    this.rigidBody.velocity = Vector2.zero;
+                    this.transform.parent = cubeCenter;
+                    this.transform.localPosition = cubeCenter.localPosition;
+                    isMoving = false;
+                    lastCubeHashCode = cubeCenter.GetHashCode();
+//                    Debug.Log(currentDistance);
+                }
             }
         }
     }
@@ -52,26 +59,32 @@ public class CubePlayer : MonoBehaviour
 
     void OnSwipeUp()
     {
-        if (isMoving) return;
+        if (isMoving)
+            return;
         this.rigidBody.AddForce(Vector2.up * 1000f * movementForce * Time.deltaTime);
         isMoving = true;
     }
 
     void OnSwipeDown()
     {
-        if (isMoving) return;
+        if (isMoving)
+            return;
         this.rigidBody.AddForce(-1f * Vector2.up * 1000f * movementForce * Time.deltaTime);
         isMoving = true;
     }
+
     void OnSwipeLeft()
     {
-        if (isMoving) return;
+        if (isMoving)
+            return;
         this.rigidBody.AddForce(-1f * Vector2.right * 1000f * movementForce * Time.deltaTime);
         isMoving = true;
     }
+
     void OnSwipeRight()
     {
-        if (isMoving) return;
+        if (isMoving)
+            return;
         this.rigidBody.AddForce(Vector2.right * 1000f * movementForce * Time.deltaTime);
         isMoving = true;
     }
@@ -81,21 +94,12 @@ public class CubePlayer : MonoBehaviour
         if (!collider.name.Equals("Center") && !collider.name.StartsWith("Cube Spawner"))
         {
             SceneManager.LoadScene(1);
-            //StopMoving();
         }
-        //Debug.Log(collider.name);
     }
 
     void OnHitCubeCenter(Transform t)
     {
         this.cubeCenter = t;
-        //StartCoroutine(StopMoving(t));
-    }
-    IEnumerator StopMoving(Transform t)
-    {
-        yield return new WaitForSeconds(0.05f);
-        this.rigidBody.velocity = Vector2.zero;
-        this.transform.parent = t;
-        isMoving = false;
+        this.cubeHitCount++;
     }
 }

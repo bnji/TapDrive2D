@@ -12,7 +12,7 @@ public class CubeControl : MonoBehaviour
     void Update()
     {
         //Debug.Log(Input.touchCount);
-        if(Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             this.gameObject.SendMessage("OnSwipeUp");
             //Debug.Log("up");
@@ -43,32 +43,31 @@ public class CubeControl : MonoBehaviour
                 case TouchPhase.Ended:
                     {
                         float swipeDistVertical = (new Vector3(0, touch.position.y, 0) - new Vector3(0, startPos.y, 0)).magnitude;
+                        float swipeDistHorizontal = (new Vector3(touch.position.x, 0, 0) - new Vector3(startPos.x, 0, 0)).magnitude;
+//                        Debug.Log(swipeDistHorizontal);
                         if (swipeDistVertical > minSwipeDistY)
                         {
 
                             float swipeValue = Mathf.Sign(touch.position.y - startPos.y);
-                            if (swipeValue > 0f)//up swipe
+                            if (swipeValue > 0f)
                             {
-                                Debug.Log("up");
-                                //Jump ();
+                                this.gameObject.SendMessage("OnSwipeUp");
                             }
-                            else if (swipeValue < 0f)//down swipe
+                            else if (swipeValue < 0f)
                             {
-                                Debug.Log("down");
-                                //Shrink ();
+                                this.gameObject.SendMessage("OnSwipeDown");
                             }
                         }
-                        float swipeDistHorizontal = (new Vector3(touch.position.x, 0, 0) - new Vector3(startPos.x, 0, 0)).magnitude;
                         if (swipeDistHorizontal > minSwipeDistX)
                         {
                             float swipeValue = Mathf.Sign(touch.position.x - startPos.x);
-                            if (swipeValue > 0f)//right swipe
+                            if (swipeValue > 0f)
                             {
-                                //MoveRight ();
+                                this.gameObject.SendMessage("OnSwipeRight");
                             }
-                            else if (swipeValue < 0f)//left swipe
+                            else if (swipeValue < 0f)
                             {
-                                //MoveLeft ();
+                                this.gameObject.SendMessage("OnSwipeLeft");
                             }
                         }
                     }
